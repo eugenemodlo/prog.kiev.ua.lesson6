@@ -4,10 +4,9 @@ import java.math.BigInteger;
 import java.util.stream.IntStream;
 
 public class MathFunc {
-    public MathFunc() {};
 
     public BigInteger getFactorial(int in) {
-        BigInteger out = new BigInteger("0");
+        BigInteger out;
         if (in < 1) {
             out = BigInteger.valueOf(1);
         } else {
