@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.util.stream.IntStream;
 
 public class MathFactorial implements Runnable {
-    private int number = 0;
+    final private int number;
 
     public MathFactorial(int number) {
         super();
