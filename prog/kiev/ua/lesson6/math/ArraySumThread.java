@@ -4,7 +4,7 @@ public class ArraySumThread implements Runnable {
     final private int[] inputArray;
     private final int begin;
     private final int end;
-    private double sum = 0;
+    private int sum = 0;
     private final Thread thread;
 
     public ArraySumThread(int[] inputArray, int begin, int end) {
@@ -25,7 +25,7 @@ public class ArraySumThread implements Runnable {
         }
     }
 
-    public double getSum() {
+    public int getSum() {
         return this.sum;
     }
 
