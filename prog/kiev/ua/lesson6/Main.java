@@ -1,19 +1,12 @@
 package prog.kiev.ua.lesson6;
 
-import prog.kiev.ua.lesson6.math.ArraySumMultiThread;
-import prog.kiev.ua.lesson6.math.ArraySumThread;
-import prog.kiev.ua.lesson6.math.MathFactorial;
-import prog.kiev.ua.lesson6.math.ShellSort;
+import prog.kiev.ua.lesson6.math.ShellSortTread;
 
 public class Main {
     public static void main(String[] args) {
-        ShellSort shellSort = new ShellSort();
 
         int[] input = new int[] {11, 24, 23, 14, 51, 600, 17, 86, 49, 100};
-        input = shellSort.sort(input);
-        for (int i: input) {
-            System.out.print(i + " ");
-        }
+
 
 ////         STEP 1
 //        for (int i = 1; i <= 100; i++) {
