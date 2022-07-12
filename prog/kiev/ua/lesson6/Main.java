@@ -1,7 +1,10 @@
 package prog.kiev.ua.lesson6;
 
+import prog.kiev.ua.lesson6.file.FileUtility;
 import prog.kiev.ua.lesson6.math.ShellSortMultiTread;
 import prog.kiev.ua.lesson6.math.ShellSortTread;
+
+import java.io.File;
 
 public class Main {
     public static void main(String[] args) {
@@ -31,5 +34,8 @@ public class Main {
 //        for (int i: shellSortMultiTread.sort(input, 3)) {
 //            System.out.print( i + " ");
 //        }
-    }
+
+        FileUtility fileUtility = new FileUtility();
+        fileUtility.CopyDirectory();
+   }
 }

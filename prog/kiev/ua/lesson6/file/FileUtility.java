@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Properties;
 
 public class FileUtility {
@@ -13,7 +15,7 @@ public class FileUtility {
     public FileUtility() {
         Properties property = new Properties();
         try {
-            property.load(new FileInputStream("dir.properties"));
+            property.load(new FileInputStream("Resources/dir.properties"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -21,48 +23,103 @@ public class FileUtility {
         this.outDirectory = new File(property.getProperty("OUT_DIR"));
     }
 
-    private boolean copyFile(File inputFile, File outputFile) {
-        if (createNewFile(outputFile)) {
-            try (FileInputStream fis = new FileInputStream(inputFile);
-                 FileOutputStream fos = new FileOutputStream(outputFile)) {
-                byte[] buffer = new byte[1024];
-                int byteRead;
+    public void CopyDirectory() {
 
-                while ((byteRead = fis.read(buffer)) > 0) {
-                    fos.write(buffer, 0, byteRead);
-                }
-                return true;
+        CopyFileTread[] copyFileTread = new CopyFileTread[Objects.requireNonNull(this.sourceDirectory.listFiles()).length];
+        File[] sourceFiles = sourceDirectory.listFiles();
 
-            } catch (IOException e) {
+        for (int i = 0; i < copyFileTread.length; i++) {
+            assert sourceFiles != null;
+            copyFileTread[i] = new CopyFileTread(sourceFiles[i], new File(this.outDirectory, sourceFiles[i].getName()));
+        }
+
+        for (CopyFileTread fileTread : copyFileTread) {
+            try {
+                fileTread.getThread().join();
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
-        return false;
+        if (Arrays.stream(copyFileTread).anyMatch(copy -> !copy.getSuccessfulCopy())) {
+            System.out.println("Some file(s) does not copied!");
+        } else {
+            System.out.println("All files copied successfully!");
+        }
+
     }
 
-    private boolean createNewFile(File file) {
-        if (!file.exists()) {
-            File dir = new File(file.getParent());
-            if (!dir.exists()) {
-                if (!dir.mkdir()) {
-                    System.out.println("Can't create directory at: " + file.getPath());
-                    return false;
+    private class CopyFileTread implements Runnable {
+        private final File inputFile;
+        private final File outputFile;
+        private final Thread thread;
+
+        private boolean successfulCopy = false;
+
+        public CopyFileTread(File inputFile, File outputFile) {
+            this.inputFile = inputFile;
+            this.outputFile = outputFile;
+            thread = new Thread(this);
+        }
+
+        @Override
+        public void run() {
+            if (copyFile(this.inputFile, this.outputFile)) {
+                System.out.println("File " + inputFile.getName() + " was copied successfully!");
+                this.successfulCopy = true;
+            } else System.out.println("Can't copy file: " + inputFile.getName());
+        }
+
+        private boolean createNewFile(File file) {
+            if (!file.exists()) {
+                File dir = new File(file.getParent());
+                if (!dir.exists()) {
+                    if (!dir.mkdir()) {
+                        System.out.println("Can't create directory at: " + file.getPath());
+                        return false;
+                    }
+                }
+
+                try {
+                    if (file.createNewFile()) {
+                        return true;
+                    } else {
+                        System.out.println("Can't create the file:" + file.getName());
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("File: " + file.getName() + " already exist");
+            }
+            return false;
+        }
+
+        private boolean copyFile(File inputFile, File outputFile) {
+            if (createNewFile(outputFile)) {
+                try (FileInputStream fis = new FileInputStream(inputFile);
+                     FileOutputStream fos = new FileOutputStream(outputFile)) {
+                    byte[] buffer = new byte[1024];
+                    int byteRead;
+
+                    while ((byteRead = fis.read(buffer)) > 0) {
+                        fos.write(buffer, 0, byteRead);
+                    }
+                    return true;
+
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
 
-            try {
-                if (file.createNewFile()) {
-                    return true;
-                } else {
-                    System.out.println("Can't create the file:" + file.getName());
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("File: " + file.getName() + " already exist");
+            return false;
         }
-        return false;
+
+        public boolean getSuccessfulCopy() {
+            return this.successfulCopy;
+        }
+        public Thread getThread() {
+            return this.thread;
+        }
     }
 }
