@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 
 public class FileUtility {
     private final File sourceDirectory;
@@ -49,6 +47,45 @@ public class FileUtility {
 
     }
 
+    private class FileCopyDaemon implements Runnable {
+        private final File inputFile;
+        private final File outputFile;
+        private final Thread thread;
+
+        public FileCopyDaemon(File inputFile, File outputFile) {
+            this.inputFile = inputFile;
+            this.outputFile = outputFile;
+            thread = new Thread(this);
+            thread.setDaemon(true);
+            thread.start();
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+
+            }
+        }
+
+        private ArrayList<File> getChangedFiles(File inputDir, File outputDir) {
+            ArrayList<File> outputList = new ArrayList<>();
+            HashMap<String, Long> inputFileMap = new HashMap<>();
+
+            for (File file : Objects.requireNonNull(inputDir.listFiles())) {
+                inputFileMap.put(file.getName(), file.lastModified());
+            }
+
+            for (File file : Objects.requireNonNull(outputDir.listFiles())) {
+                if (!inputFileMap.containsKey(file.getName()) ||
+                        file.lastModified() < inputFileMap.get(file.getName())) {
+                    outputList.add(file);
+                }
+            }
+            return outputList;
+        }
+
+    }
+
     private class CopyFileTread implements Runnable {
         private final File inputFile;
         private final File outputFile;
@@ -60,6 +97,7 @@ public class FileUtility {
             this.inputFile = inputFile;
             this.outputFile = outputFile;
             thread = new Thread(this);
+            thread.start();
         }
 
         @Override
@@ -118,6 +156,7 @@ public class FileUtility {
         public boolean getSuccessfulCopy() {
             return this.successfulCopy;
         }
+
         public Thread getThread() {
             return this.thread;
         }

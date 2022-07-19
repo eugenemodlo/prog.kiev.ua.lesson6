@@ -36,6 +36,6 @@ public class Main {
 //        }
 
         FileUtility fileUtility = new FileUtility();
-        fileUtility.CopyDirectory();
+//        fileUtility.CopyDirectory();
    }
 }
