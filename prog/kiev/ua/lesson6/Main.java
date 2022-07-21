@@ -5,6 +5,7 @@ import prog.kiev.ua.lesson6.math.ShellSortMultiTread;
 import prog.kiev.ua.lesson6.math.ShellSortTread;
 
 import java.io.File;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
@@ -37,5 +38,16 @@ public class Main {
 
         FileUtility fileUtility = new FileUtility();
 //        fileUtility.CopyDirectory();
+        fileUtility.startCopyDaemon();
+        boolean loopKey = true;
+        final Scanner scanner = new Scanner(System.in);
+        System.out.println("Press (Y) for exit!");
+        while (loopKey) {
+            String key = scanner.nextLine();
+            if (key.equals("Y")) {
+                loopKey = false;
+            }
+        }
+
    }
 }

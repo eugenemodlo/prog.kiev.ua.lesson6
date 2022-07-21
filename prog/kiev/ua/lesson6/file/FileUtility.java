@@ -47,6 +47,10 @@ public class FileUtility {
 
     }
 
+    public void startCopyDaemon() {
+        new FileCopyDaemon(this.sourceDirectory, this.outDirectory);
+    }
+
     private class FileCopyDaemon implements Runnable {
         private final File inputFile;
         private final File outputFile;
@@ -62,22 +66,33 @@ public class FileUtility {
 
         @Override
         public void run() {
+            final long PAUSE_TIME = 10000;
             while (true) {
+                ArrayList<File> listFiles = getChangedFiles(this.inputFile, this.outputFile);
+                if (listFiles.size() > 0) {
+                    listFiles.forEach(file -> {
+                        new CopyFileTread(file, new File(outputFile, file.getName()));
+                    });
+                }
+                try {
+                    Thread.sleep(PAUSE_TIME);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
             }
         }
 
         private ArrayList<File> getChangedFiles(File inputDir, File outputDir) {
             ArrayList<File> outputList = new ArrayList<>();
-            HashMap<String, Long> inputFileMap = new HashMap<>();
-
-            for (File file : Objects.requireNonNull(inputDir.listFiles())) {
-                inputFileMap.put(file.getName(), file.lastModified());
-            }
+            HashMap<String, Long> diffFileMap = new HashMap<>();
 
             for (File file : Objects.requireNonNull(outputDir.listFiles())) {
-                if (!inputFileMap.containsKey(file.getName()) ||
-                        file.lastModified() < inputFileMap.get(file.getName())) {
+                diffFileMap.put(file.getName(), file.lastModified());
+            }
+
+            for (File file : Objects.requireNonNull(inputDir.listFiles())) {
+                if (!diffFileMap.containsKey(file.getName())) {
                     outputList.add(file);
                 }
             }
